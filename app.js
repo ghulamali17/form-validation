@@ -5,7 +5,18 @@ let passerror = document.getElementById("passerror");
 let emailErr = document.getElementById("emailErr");
 let selectErr = document.getElementById("selectErr");
 let usererror = document.getElementById("usererror");
+let selectedCity = document.getElementById("state");
+let userInfo = [];
 
+function UserData(userName, password, email, gender, city) {
+  this.userName = userName;
+  this.password = password;
+  this.email = email;
+  this.gender = gender;
+  this.city = city;
+}
+
+// Username Validation
 function checkUser() {
   let nameRegex = /^[a-zA-Z0-9_.]{3,20}$/;
   if (!username.value.match(nameRegex)) {
@@ -21,6 +32,8 @@ function checkUser() {
   }
 }
 
+// Password Validation
+
 function checkPass() {
   let passRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
@@ -34,6 +47,7 @@ function checkPass() {
   }
 }
 
+// Email Validation
 function checkEmail() {
   let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email.value.match(emailRegex)) {
@@ -45,9 +59,10 @@ function checkEmail() {
   }
 }
 
+// Dropdown Validation
 function checkSelect() {
-  if (document.getElementById("state").selectedIndex === 0) {
-    selectErr.innerHTML = "Please select a state.";
+  if (selectedCity.selectedIndex === 0) {
+    selectErr.innerHTML = "Please select a city.";
     return false;
   } else {
     selectErr.innerHTML = "";
@@ -55,6 +70,7 @@ function checkSelect() {
   }
 }
 
+// Gender Validation
 function validateGender() {
   const genderInputs = document.getElementsByName("gender");
   const errorMessage = document.getElementById("errorMessage");
@@ -67,7 +83,7 @@ function validateGender() {
   }
 
   if (isSelected) {
-    errorMessage.textContent = ""; 
+    errorMessage.textContent = "";
     return true;
   } else {
     errorMessage.textContent = "Please select your gender.";
@@ -75,23 +91,54 @@ function validateGender() {
   }
 }
 
+// Form Submit Handler
 function formValidate(e) {
   e.preventDefault();
+  usererror.innerHTML = "";
+  emailErr.innerHTML = "";
+  selectErr.innerHTML = "";
+  errorMessage.textContent = "";
 
+  // Duplicate Username and Email
+  for (let i = 0; i < userInfo.length; i++) {
+    if (username.value === userInfo[i].userName) {
+      usererror.innerHTML = "Username already exists.";
+      return false;
+    }
+    if (email.value === userInfo[i].email) {
+      emailErr.innerHTML = "Email already exists.";
+      return false;
+    }
+  }
+
+  const isUserValid = checkUser();
   const isPassValid = checkPass();
   const isEmailValid = checkEmail();
   const isSelectValid = checkSelect();
-  const isUserValid = checkUser();
-  const IsGenderValid = validateGender();
+  const isGenderValid = validateGender();
 
   if (
     isUserValid &&
     isPassValid &&
     isEmailValid &&
     isSelectValid &&
-    IsGenderValid
+    isGenderValid
   ) {
     alert("Form submitted successfully");
+    const selectedGender = document.querySelector(
+      'input[name="gender"]:checked'
+    )?.value;
+    
+    let user = new UserData(
+      username.value,
+      password.value,
+      email.value,
+      selectedGender,
+      selectedCity.value
+    );
+
+    userInfo.push(user);
+    console.log(userInfo);
     return true;
   } else {
     alert("Please correct the errors before submitting.");
